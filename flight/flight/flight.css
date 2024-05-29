@@ -1,0 +1,91 @@
+/* Style for flight number */
+.flight-number {
+    color: #333;
+    /* Dark gray color */
+    font-size: 48px;
+    /* Larger font size */
+    margin-bottom: 10px;
+    /* Space below the element */
+    text-align: center;
+    /* Center align text */
+    font-weight: bold;
+    /* Bold text */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    padding: 30px;
+    /* Space inside the element */
+
+}
+
+/* Style for destination */
+.destination {
+    color: #333;
+    /* Slightly darker gray color */
+    font-size: 96px;
+    /* Larger font size */
+    text-align: center;
+    /* Center align text */
+    width: 100%;
+    /* Full width */
+    margin-bottom: 20px;
+    /* Space below the element */
+    height: 100%;
+    /* Full height */
+    padding: 100px;
+    /* Space inside the element */
+    font-weight: bold;
+    /* Bold text */
+}
+
+/* Style for flight status */
+.flight-status {
+    font-size: 96px;
+    /* Very large font size */
+    font-weight: bold;
+    /* Bold text */
+    text-align: center;
+    /* Center align text */
+    margin-bottom: 20px;
+    /* Space below the element */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    background-color: #f8f9fa;
+    /* Light gray color */
+    padding: 100px;
+}
+
+/* Style for image */
+.flight-logo {
+    max-width: 100%;
+    /* Ensure the image stays within container */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin-bottom: 20px;
+    /* Space below the image */
+    display: block;
+    /* Display as block element */
+}
+
+/* Style for time text */
+#txt {
+    max-width: 100%;
+    font-size: 48px;
+    /* Large font size */
+    color: #333;
+    /* Gray color */
+    text-align: center;
+    /* Right align text */
+    font-weight: bold;
+    /* Bold text */
+    margin-bottom: 10px;
+    /* Space below the element */
+    height: 100%;
+    /* Full height */
+    padding: 25px;
+    /* Space inside the element */
+    display: block;
+}
