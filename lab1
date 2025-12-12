@@ -1,0 +1,234 @@
+import random
+import time
+
+class DogAgent:
+    def __init__(self, n_rooms, k_lives):
+        """
+        Нохой тэжээх агентын анхны тохиргоо
+        
+        Parameters:
+        n_rooms (int): Өрөөний тоо
+        k_lives (int): Нохойны амь
+        """
+        self.n_rooms = n_rooms
+        self.k_lives = k_lives
+        self.current_lives = k_lives
+        self.current_room = 0
+        self.has_eaten = False
+        self.visited_all = False
+        self.room_features = []
+        self.visited_rooms = []
+        self.moves = 0
+        
+        # Өрөөнүүдийг санамсаргүйгээр эхлүүлэх
+        self._initialize_rooms()
+        
+    def _initialize_rooms(self):
+        """Өрөөнүүдийг санамсаргүй онцлогуудтайгаар эхлүүлэх"""
+        features = ['food', 'bed', 'toy', 'empty']
+        self.room_features = [random.choice(features) for _ in range(self.n_rooms)]
+        
+    def _shuffle_rooms(self):
+        """Бүх өрөөг зорчиж дууссаны дараа өрөөний онцлогуудыг санамсаргүйгээр өөрчлөх"""
+        features = ['food', 'bed', 'toy', 'empty']
+        self.room_features = [random.choice(features) for _ in range(self.n_rooms)]
+        print(f"Өрөөнүүдийн онцлогууд шинэчлэгдлээ: {self.room_features}")
+        
+    def _move_to_next_room(self):
+        """Дараагийн өрөө рүү шилжих"""
+        # Зүүнээс баруун тийш шилжих
+        if self.current_room < self.n_rooms - 1:
+            self.current_room += 1
+            return True
+        else:
+            # Бүх өрөөг зорчиж дууссан эсэхийг шалгах
+            if not self.visited_all:
+                self.visited_all = True
+                print("\n" + "="*50)
+                print("Бүх өрөөг амжилттай зорчилоо! Өрөөнүүдийн онцлогууд шинэчлэгдэж байна...")
+                print("="*50)
+                self._shuffle_rooms()
+                self.current_room = 0  # Эхний өрөө рүү буцах
+                return True
+            else:
+                # Бүх өрөөг зорчиж дууссаны дараа зүүнээс баруун, баруунаас зүүн шилжих
+                # Энэ тохиолдолд матриц хэлбэртэй гэж үзээд эсрэг чиглэлд шилжих
+                if hasattr(self, 'moving_right') and not self.moving_right:
+                    if self.current_room > 0:
+                        self.current_room -= 1
+                        return True
+                    else:
+                        self.moving_right = True
+                        self.current_room += 1
+                        return True
+                else:
+                    if self.current_room < self.n_rooms - 1:
+                        self.current_room += 1
+                        return True
+                    else:
+                        self.moving_right = False
+                        self.current_room -= 1
+                        return True
+                        
+    def _process_room(self, room_index):
+        """Өрөөнд орж ирээд түүний онцлогоос хамааран үйлдэл хийх"""
+        feature = self.room_features[room_index]
+        print(f"\n[{self.moves}] Өрөө {room_index+1}/{self.n_rooms}: '{feature}' онцлогтой")
+        
+        # Хоосон өрөө дарааллавал амь алдах
+        if feature == 'empty':
+            if room_index in self.visited_rooms and len(self.visited_rooms) > 1 and self.visited_rooms[-2] == room_index:
+                print("  ⚠️  Хоосон өрөөг дараалан орлоо! Амь алдлаа.")
+                self.current_lives -= 1
+                return
+        
+        # Өрөөний онцлогт хамаарах үйлдлүүд
+        if feature == 'food':
+            print("  🍖 Хоол идлээ. Одоо идсэн байна.")
+            self.has_eaten = True
+            
+        elif feature == 'bed':
+            if self.has_eaten:
+                print("  🛏️  Унтлаа. Сэрлээ.")
+                self.has_eaten = False  # Унтаад сэрсэн бол хоол идээгүй гэж үзнэ
+            else:
+                print("  ☠️  Идээгүй байхад унтлаа. Амь алдлаа.")
+                self.current_lives -= 1
+                
+        elif feature == 'toy':
+            if not self.has_eaten:
+                print("  ☠️  Идээгүй байхад тоглов. Амь алдлаа.")
+                self.current_lives -= 1
+            else:
+                print("  🎾 Тоглов. Хөгжилтэй байна.")
+                
+        elif feature == 'empty':
+            print("  ⬜ Хоосон өрөө. Юу ч байхгүй.")
+            
+        # Өрөөнд зорчих түүхэд нэмэх
+        if room_index not in self.visited_rooms:
+            self.visited_rooms.append(room_index)
+            
+    def display_status(self):
+        """Тоглоомын одоогийн төлвийг харуулах"""
+        print(f"\n{'='*60}")
+        print(f"НОХОЙНЫ ТӨЛӨВ: {self.current_lives}/{self.k_lives} амьтай")
+        print(f"Одоогийн байрлал: {self.current_room+1} дахь өрөө")
+        print(f"Идсэн эсэх: {'Тийм' if self.has_eaten else 'Үгүй'}")
+        print(f"Өрөөний онцлогууд: {self.room_features}")
+        print(f"{'='*60}")
+        
+    def play(self):
+        """Тоглоомыг эхлүүлэх"""
+        print("="*60)
+        print("НОХОЙ ТЭЖЭЭХ ТОГЛООМ ЭХЭЛЛЭЭ")
+        print("="*60)
+        print(f"Өрөөний тоо: {self.n_rooms}")
+        print(f"Нохойны амь: {self.k_lives}")
+        print("Өрөөний онцлогууд: ", self.room_features)
+        print("\nДүрэм:")
+        print("1. Идсэний дараа унтаж болохгүй - үхнэ")
+        print("2. Идээгүй байхдаа тоглож болохгүй - үхнэ")
+        print("3. Хоосон өрөөг дарааллавал - үхнэ")
+        print("="*60)
+        
+        # Матриц хэлбэртэй шилжихэд зориулсан хувьсагч
+        self.moving_right = True
+        
+        # Тоглоомын гол давталт
+        while self.current_lives > 0:
+            self.moves += 1
+            self.display_status()
+            
+            # Өрөөнд орж ирэх
+            self._process_room(self.current_room)
+            
+            # Амь дууссан эсэхийг шалгах
+            if self.current_lives <= 0:
+                print(f"\n{'☠️'*20}")
+                print("НОХОЙ ҮХЛЭЭ! ТОГЛООМ ДУУССАН!")
+                print(f"{'☠️'*20}")
+                break
+                
+            # Дараагийн өрөө рүү шилжих
+            print(f"\nДараагийн өрөө рүү шилжиж байна...")
+            time.sleep(1.5)
+            
+            if not self._move_to_next_room():
+                print("Өрөөнүүдийн хооронд шилжих боломжгүй байна.")
+                break
+                
+        # Тоглоомын төгсгөлийн мэдээлэл
+        self._show_game_summary()
+        
+    def _show_game_summary(self):
+        """Тоглоомын төгсгөлийн дүнг харуулах"""
+        print("\n" + "="*60)
+        print("ТОГЛООМЫН ДҮН")
+        print("="*60)
+        print(f"Өрөөний тоо: {self.n_rooms}")
+        print(f"Эхний амь: {self.k_likes}")
+        print(f"Үлдсэн амь: {max(0, self.current_lives)}")
+        print(f"Хийсэн алхамууд: {self.moves}")
+        print(f"Зорьсон өрөөнүүд: {len(set(self.visited_rooms))}/{self.n_rooms}")
+        
+        if self.current_lives > 0:
+            print(f"\n🎉 АМЖИЛТТАЙ! Нохой амьд үлдлээ!")
+        else:
+            print(f"\n☠️ ХОХИРОЛ! Нохой үхлээ.")
+            
+        # Өрөөний онцлогуудын статистик
+        feature_count = {}
+        for feature in self.room_features:
+            feature_count[feature] = feature_count.get(feature, 0) + 1
+            
+        print(f"\nӨрөөний онцлогуудын тархалт:")
+        for feature, count in feature_count.items():
+            print(f"  {feature}: {count} өрөө")
+
+
+def main():
+    """Үндсэн програм"""
+    print("НОХОЙ ТЭЖЭЭХ АГЕНТ - ТОГЛООМ")
+    print("="*50)
+    
+    # Тоглогч тохиргоог оруулах
+    while True:
+        try:
+            n_rooms = int(input("Өрөөний тоог оруулна уу (5-20): "))
+            if 5 <= n_rooms <= 20:
+                break
+            else:
+                print("5-20-ын хооронд тоо оруулна уу.")
+        except ValueError:
+            print("Тоо оруулна уу.")
+            
+    while True:
+        try:
+            k_lives = int(input("Нохойны амь (3-10): "))
+            if 3 <= k_lives <= 10:
+                break
+            else:
+                print("3-10-ын хооронд тоо оруулна уу.")
+        except ValueError:
+            print("Тоо оруулна уу.")
+    
+    # Тоглоомыг эхлүүлэх
+    game = DogAgent(n_rooms, k_lives)
+    game.play()
+    
+    # Дахин тоглох эсэхийг асуух
+    while True:
+        play_again = input("\nДахин тоглох уу? (Т/Ү): ").strip().lower()
+        if play_again in ['т', 'y', 'yes']:
+            main()
+            break
+        elif play_again in ['ү', 'n', 'no']:
+            print("Тоглоом дууслаа. Баяртай!")
+            break
+        else:
+            print("'Т' эсвэл 'Ү' гэж оруулна уу.")
+
+
+if __name__ == "__main__":
+    main()
